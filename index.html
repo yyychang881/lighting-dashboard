@@ -269,7 +269,7 @@
             document.getElementById('clock').innerText = now.toLocaleTimeString('zh-TW', { hour12: false });
         }, 1000);
 
-        // 燈種對應資料結構（對應您的 CSV 順序：taisui, light, wealth, wisdom, edu, career）
+        // 燈種對應資料結構
         let lightData = {
             taisui: { key: 'taisui', name: '太歲燈', total: 1094, count: 0 },
             light: { key: 'light', name: '光明燈', total: 2104, count: 0 },
@@ -301,7 +301,6 @@
 
         // 核心：每 5 秒自動去抓取 Google 試算表的 CSV 連結
         async function fetchSheetData() {
-            // 已內建您專屬的 Google 試算表 CSV 連結
             const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTWYWEJW5T44BxNCdQuJ3xkmjzCHFl9OwPEyjatbhXZHT2YVc3Reqg-dRBdmpnXh0I9MEWTlyvABmgN/pub?gid=0&single=true&output=csv';
 
             try {
