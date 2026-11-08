@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高雄市妙音精舍 2027年點燈吉祥通啓 琉璃殿堂戰報</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;900&family=Noto+Sans+TC:wght@400;700;900&display=swap');
+        
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #030712;
+            color: #f3f4f6;
+            overflow-x: hidden;
+        }
+
+        .title-font {
+            font-family: 'Noto Serif TC', serif;
+        }
+
+        /* 琉璃金光發光字體 */
+        .neon-gold {
+            text-shadow: 0 0 15px rgba(234, 179, 8, 0.6), 0 0 30px rgba(202, 138, 4, 0.4);
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* 典雅邊框發光 */
+        .glass-panel {
+            background: linear-gradient(135deg, rgba(17, 24, 39, 0.9), rgba(3, 7, 18, 0.95));
+            border: 1px solid rgba(234, 179, 8, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(234, 179, 8, 0.05);
+        }
+
+        /* 背景微光掃描線 */
+        .scanlines {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.15));
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0.25;
+        }
+
+        /* 燈號更新瞬間的高光閃爍 */
+        @keyframes divine-flash {
+            0% { border-color: rgba(234, 179, 8, 0.3); background-color: rgba(17, 24, 39, 0.9); }
+            15% { border-color: rgba(239, 68, 68, 0.9); background-color: rgba(127, 29, 29, 0.4); }
+            50% { border-color: rgba(234, 179, 8, 0.9); background-color: rgba(113, 63, 18, 0.4); }
+            100% { border-color: rgba(234, 179, 8, 0.3); background-color: rgba(17, 24, 39, 0.9); }
+        }
+        .flash-update {
+            animation: divine-flash 1.5s ease-out;
+        }
+
+        /* 跑馬燈動畫：秒數越大跑得越慢 (原 30s 改為 50s) */
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        .animate-marquee {
+            display: inline-block;
+            white-space: nowrap;
+            animation: marquee 200s linear infinite;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+    <div class="scanlines"></div>
+
+    <!-- 頂部殿堂大橫幅 -->
+    <header class="w-full glass-panel border-b-2 border-yellow-500/40 p-6 z-10 relative shadow-2xl">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            
+            <!-- 左側吉祥對聯區 -->
+            <div class="hidden xl:flex items-center text-yellow-500/80 font-serif text-lg tracking-widest gap-3">
+                <span class="text-yellow-400">❖</span> 點燈普照綿福澤
+            </div>
+
+            <!-- 中央核心標題 -->
+            <div class="text-center flex flex-col items-center gap-2">
+                <div class="flex items-center gap-3">
+                    <span class="bg-red-700 text-amber-100 text-xs px-3 py-1 rounded font-bold animate-pulse tracking-widest border border-red-500">點燈 LIVE 實況</span>
+                    <span id="clock" class="text-xl font-mono text-yellow-100/80">00:00:00</span>
+                </div>
+                <h1 class="title-font text-3xl md:text-4xl lg:text-5xl font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 via-yellow-400 to-amber-600 drop-shadow-lg">
+                    高雄市妙音精舍 2027年點燈吉祥通啓
+                </h1>
+            </div>
+
+            <!-- 右側吉祥對聯區 -->
+            <div class="hidden xl:flex items-center text-yellow-500/80 font-serif text-lg tracking-widest gap-3">
+                善信共聚植菩提 <span class="text-yellow-400">❖</span>
+            </div>
+        </div>
+
+        <!-- 大盤總計量條 -->
+        <div class="max-w-4xl mx-auto mt-6 pt-4 border-t border-yellow-500/20">
+            <div class="flex justify-between items-center text-sm md:text-base font-bold text-yellow-100/90 mb-2">
+                <span class="tracking-wider flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-yellow-400 animate-ping"></span> 全區總點燈圓滿達成率</span>
+                <span class="text-yellow-400">總計已點：<span id="grand-total" class="neon-text text-2xl md:text-3xl ml-1">0</span> / 6801 盞</span>
+            </div>
+            <div class="w-full bg-gray-900 rounded-full h-5 p-0.5 border border-yellow-500/40 relative shadow-inner overflow-hidden">
+                <div id="grand-bar" class="bg-gradient-to-r from-amber-700 via-yellow-500 to-yellow-200 h-full rounded-full transition-all duration-1000 ease-out" style="width: 0%"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 中段壇城 6 大燈種開票主區 (2x3 Grid) -->
+    <main class="flex-grow max-w-7xl w-full mx-auto p-6 z-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-center">
+        
+        <!-- 太歲燈 -->
+        <div id="card-taisui" class="glass-panel rounded-2xl p-6 relative overflow-hidden transition-all duration-300 flex flex-col justify-between h-full">
+            <div id="badge-taisui" class="absolute top-3 right-3 bg-gradient-to-r from-yellow-500 to-amber-600 text-gray-950 text-xs font-black px-3 py-1 rounded-full hidden shadow-[0_0_15px_rgba(234,179,8,0.8)] border border-yellow-200 animate-bounce">🏆 首座功德</div>
+            <div>
+                <div class="text-yellow-500/70 text-xs tracking-widest mb-1 font-serif">第一區</div>
+                <h2 class="title-font text-3xl font-black text-yellow-100 tracking-wider mb-4">太歲燈</h2>
+            </div>
+            <div class="flex justify-between items-end my-2">
+                <div class="text-gray-400 text-sm">可點總數：<span class="text-gray-200 font-bold">1124</span></div>
+                <div class="text-right">
+                    <div class="text-xs text-yellow-400/80 mb-1 font-bold">已點燈數</div>
+                    <div id="count-taisui" class="text-5xl lg:text-6xl font-black text-yellow-400 neon-gold">0</div>
+                </div>
+            </div>
+            <div class="w-full bg-gray-950 rounded-full h-3 my-3 overflow-hidden border border-yellow-500/20">
+                <div id="bar-taisui" class="bg-gradient-to-r from-amber-600 to-yellow-400 h-full transition-all duration-1000 ease-out" style="width: 0%"></div>
+            </div>
+            <div class="flex justify-between text-xs font-bold pt-2 border-t border-gray-800">
+                <span class="text-gray-400">圓滿進度</span>
+                <span class="text-emerald-400">剩餘可點：<span id="remain-taisui" class="text-sm">1124</span> 盞</span>
+            </div>
+        </div>
+
+        <!-- 光明燈 -->
+        <div id="card-light" class="glass-panel rounded-2xl p-6 relative overflow-hidden transition-all duration-300 flex flex-col justify-between h-full">
+            <div id="badge-light" class="absolute top-3 right-3 bg-gradient-to-r from-yellow-500 to-amber-600 text-gray-950 text-xs font-black px-3 py-1 rounded-full hidden shadow-[0_0_15px_rgba(234,179,8,0.8)] border border-yellow-200 animate-bounce">🏆 首座功德</div>
+            <div>
+                <div class="text-yellow-500/70 text-xs tracking-widest mb-1 font-serif">第二區</div>
+                <h2 class="title-font text-3xl font-black text-yellow-100 tracking-wider mb-4">光明燈</h2>
+            </div>
+            <div class="flex justify-between items-end my-2">
+                <div class="text-gray-400 text-sm">可點總數：<span class="text-gray-200 font-bold">2104</span></div>
+                <div class="text-right">
+                    <div class="text-xs text-yellow-400/80 mb-1 font-bold">已點燈數</div>
+                    <div id="count-light" class="text-5xl lg:text-6xl font-black text-yellow-400 neon-gold">0</div>
+                </div>
+            </div>
+            <div class="w-full bg-gray-950 rounded-full h-3 my-3 overflow-hidden border border-yellow-500/20">
+                <div id="bar-light" class="bg-gradient-to-r from-amber-600 to-yellow-400 h-full transition-all duration-1000 ease-out" style="width: 0%"></div>
+            </div>
+            <div class="flex justify-between text-xs font-bold pt-2 border-t border-gray-800">
+                <span class="text-gray-400">圓滿進度</span>
+                <span class="text-emerald-400">剩餘可點：<span id="remain-light" class="text-sm">2104</span> 盞</span>
+            </div>
+        </div>
+
+        <!-- 財神燈 -->
+        <div id="card-wealth" class="glass-panel rounded-2xl p-6 relative overflow-hidden transition-all duration-300 flex flex-col justify-between h-full">
+            <div id="badge-wealth" class="absolute top-3 right-3 bg-gradient-to-r from-yellow-500 to-amber-600 text-gray-950 text-xs font-black px-3 py-1 rounded-full hidden shadow-[0_0_15px_rgba(234,179,8,0.8)] border border-yellow-200 animate-bounce">🏆 首座功德</div>
+            <div>
+                <div class="text-yellow-500/70 text-xs tracking-widest mb-1 font-serif">第三區</div>
+                <h2 class="title-font text-3xl font-black text-yellow-100 tracking-wider mb-4">財神燈</h2>
+            </div>
+            <div class="flex justify-between items-end my-2">
+                <div class="text-gray-400 text-sm">可點總數：<span class="text-gray-200 font-bold">1155</span></div>
+                <div class="text-right">
+                    <div class="text-xs text-yellow-400/80 mb-1 font-bold">已點燈數</div>
+                    <div id="count-wealth" class="text-5xl lg:text-6xl font-black text-yellow-400 neon-gold">0</div>
+                </div>
+            </div>
+            <div class="w-full bg-gray-950 rounded-full h-3 my-3 overflow-hidden border border-yellow-500/20">
+                <div id="bar-wealth" class="bg-gradient-to-r from-amber-600 to-yellow-400 h-full transition-all duration-1000 ease-out" style="width: 0%"></div>
+            </div>
+            <div class="flex justify-between text-xs font-bold pt-2 border-t border-gray-800">
+                <span class="text-gray-400">圓滿進度</span>
+                <span class="text-emerald-400">剩餘可點：<span id="remain-wealth" class="text-sm">1155</span> 盞</span>
+            </div>
+        </div>
+
+        <!-- 智慧燈 -->
+        <div id="card-wisdom" class="glass-panel rounded-2xl p-6 relative overflow-hidden transition-all duration-300 flex flex-col justify-between h-full">
+            <div id="badge-wisdom" class="absolute top-3 right-3 bg-gradient-to-r from-yellow-500 to-amber-600 text-gray-950 text-xs font-black px-3 py-1 rounded-full hidden shadow-[0_0_15px_rgba(234,179,8,0.8)] border border-yellow-200 animate-bounce">🏆 首座功德</div>
+            <div>
+                <div class="text-yellow-500/70 text-xs tracking-widest mb-1 font-serif">第四區</div>
+                <h2 class="title-font text-3xl font-black text-yellow-100 tracking-wider mb-4">智慧燈</h2>
+            </div>
+            <div class="flex justify-between items-end my-2">
+                <div class="text-gray-400 text-sm">可點總數：<span class="text-gray-200 font-bold">1240</span></div>
+                <div class="text-right">
+                    <div class="text-xs text-yellow-400/80 mb-1 font-bold">已點燈數</div>
+                    <div id="count-wisdom" class="text-5xl lg:text-6xl font-black text-yellow-400 neon-gold">0</div>
+                </div>
+            </div>
+            <div class="w-full bg-gray-950 rounded-full h-3 my-3 overflow-hidden border border-yellow-500/20">
+                <div id="bar-wisdom" class="bg-gradient-to-r from-amber-600 to-yellow-400 h-full transition-all duration-1000 ease-out" style="width: 0%"></div>
+            </div>
+            <div class="flex justify-between text-xs font-bold pt-2 border-t border-gray-800">
+                <span class="text-gray-400">圓滿進度</span>
+                <span class="text-emerald-400">剩餘可點：<span id="remain-wisdom" class="text-sm">1240</span> 盞</span>
+            </div>
+        </div>
+
+        <!-- 文昌燈 -->
+        <div id="card-edu" class="glass-panel rounded-2xl p-6 relative overflow-hidden transition-all duration-300 flex flex-col justify-between h-full">
+            <div id="badge-edu" class="absolute top-3 right-3 bg-gradient-to-r from-yellow-500 to-amber-600 text-gray-950 text-xs font-black px-3 py-1 rounded-full hidden shadow-[0_0_15px_rgba(234,179,8,0.8)] border border-yellow-200 animate-bounce">🏆 首座功德</div>
+            <div>
+                <div class="text-yellow-500/70 text-xs tracking-widest mb-1 font-serif">第五區</div>
+                <h2 class="title-font text-3xl font-black text-yellow-100 tracking-wider mb-4">文昌燈</h2>
+            </div>
+            <div class="flex justify-between items-end my-2">
+                <div class="text-gray-400 text-sm">可點總數：<span class="text-gray-200 font-bold">626</span></div>
+                <div class="text-right">
+                    <div class="text-xs text-yellow-400/80 mb-1 font-bold">已點燈數</div>
+                    <div id="count-edu" class="text-5xl lg:text-6xl font-black text-yellow-400 neon-gold">0</div>
+                </div>
+            </div>
+            <div class="w-full bg-gray-950 rounded-full h-3 my-3 overflow-hidden border border-yellow-500/20">
+                <div id="bar-edu" class="bg-gradient-to-r from-amber-600 to-yellow-400 h-full transition-all duration-1000 ease-out" style="width: 0%"></div>
+            </div>
+            <div class="flex justify-between text-xs font-bold pt-2 border-t border-gray-800">
+                <span class="text-gray-400">圓滿進度</span>
+                <span class="text-emerald-400">剩餘可點：<span id="remain-edu" class="text-sm">626</span> 盞</span>
+            </div>
+        </div>
+
+        <!-- 功名燈 -->
+        <div id="card-career" class="glass-panel rounded-2xl p-6 relative overflow-hidden transition-all duration-300 flex flex-col justify-between h-full">
+            <div id="badge-career" class="absolute top-3 right-3 bg-gradient-to-r from-yellow-500 to-amber-600 text-gray-950 text-xs font-black px-3 py-1 rounded-full hidden shadow-[0_0_15px_rgba(234,179,8,0.8)] border border-yellow-200 animate-bounce">🏆 首座功德</div>
+            <div>
+                <div class="text-yellow-500/70 text-xs tracking-widest mb-1 font-serif">第六區</div>
+                <h2 class="title-font text-3xl font-black text-yellow-100 tracking-wider mb-4">功名燈</h2>
+            </div>
+            <div class="flex justify-between items-end my-2">
+                <div class="text-gray-400 text-sm">可點總數：<span class="text-gray-200 font-bold">638</span></div>
+                <div class="text-right">
+                    <div class="text-xs text-yellow-400/80 mb-1 font-bold">已點燈數</div>
+                    <div id="count-career" class="text-5xl lg:text-6xl font-black text-yellow-400 neon-gold">0</div>
+                </div>
+            </div>
+            <div class="w-full bg-gray-950 rounded-full h-3 my-3 overflow-hidden border border-yellow-500/20">
+                <div id="bar-career" class="bg-gradient-to-r from-amber-600 to-yellow-400 h-full transition-all duration-1000 ease-out" style="width: 0%"></div>
+            </div>
+            <div class="flex justify-between text-xs font-bold pt-2 border-t border-gray-800">
+                <span class="text-gray-400">圓滿進度</span>
+                <span class="text-emerald-400">剩餘可點：<span id="remain-career" class="text-sm">638</span> 盞</span>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- 底部跑馬燈 -->
+    <footer class="w-full h-12 glass-panel border-t border-yellow-500/30 flex items-center z-10 relative overflow-hidden">
+        <div class="bg-amber-600 text-gray-950 font-black h-full px-6 flex items-center justify-center tracking-widest whitespace-nowrap z-20 shadow-md">
+            ✦ 吉祥快報
+        </div>
+        <div class="flex-grow overflow-hidden relative h-full flex items-center text-lg font-bold text-yellow-100/90">
+            <div id="ticker" class="animate-marquee pl-4">
+                高雄市妙音精舍 2027年點燈吉祥通啓，祈求諸佛菩薩護佑，點燈植福、光明圓滿... 系統每 5 秒自動同步最新資料中。
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 時鐘功能
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleTimeString('zh-TW', { hour12: false });
+        }, 1000);
+
+        // 燈種對應資料結構
+        let lightData = {
+            taisui: { key: 'taisui', name: '太歲燈', total: 1124, count: 0 },
+            light: { key: 'light', name: '光明燈', total: 2104, count: 0 },
+            wealth: { key: 'wealth', name: '財神燈', total: 1155, count: 0 },
+            wisdom: { key: 'wisdom', name: '智慧燈', total: 1240, count: 0 },
+            edu: { key: 'edu', name: '文昌燈', total: 626, count: 0 },
+            career: { key: 'career', name: '功名燈', total: 638, count: 0 }
+        };
+
+        const grandTotalLimit = 6801;
+        let currentGrandTotal = 0;
+
+        // 數字跳動動畫 (Count-up)
+        function animateValue(obj, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const easeOut = 1 - Math.pow(1 - progress, 4); 
+                obj.innerHTML = Math.floor(easeOut * (end - start) + start);
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                } else {
+                    obj.innerHTML = end;
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        // 核心：每 5 秒自動去抓取 Google 試算表的 CSV 連結
+        async function fetchSheetData() {
+            const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTWYWEJW5T44BxNCdQuJ3xkmjzCHFl9OwPEyjatbhXZHT2YVc3Reqg-dRBdmpnXh0I9MEWTlyvABmgN/pub?gid=0&single=true&output=csv';
+
+            try {
+                const response = await fetch(csvUrl + '&t=' + new Date().getTime());
+                const csvText = await response.text();
+                
+                const rows = csvText.split('\n').map(row => row.split(','));
+                
+                let newGrandTotal = 0;
+                let highestPercent = 0;
+                let championKey = '';
+
+                for (let i = 1; i < rows.length; i++) {
+                    const row = rows[i];
+                    if (row.length >= 4) {
+                        const valCount = parseInt(row[3].trim()) || 0;
+                        
+                        const keys = Object.keys(lightData);
+                        if (i - 1 < keys.length) {
+                            const k = keys[i - 1];
+                            const item = lightData[k];
+                            
+                            if (item.count !== valCount) {
+                                const oldCount = item.count;
+                                item.count = valCount;
+
+                                const card = document.getElementById(`card-${k}`);
+                                card.classList.remove('flash-update');
+                                void card.offsetWidth;
+                                card.classList.add('flash-update');
+
+                                const elCount = document.getElementById(`count-${k}`);
+                                animateValue(elCount, oldCount, item.count, 1200);
+
+                                document.getElementById(`remain-${k}`).innerText = item.total - item.count;
+                                const percent = (item.count / item.total) * 100;
+                                document.getElementById(`bar-${k}`).style.width = `${percent}%`;
+
+                                const timeStr = new Date().toLocaleTimeString('zh-TW', { hour12: false });
+                                const ticker = document.getElementById('ticker');
+                                ticker.innerHTML = `<span class="bg-yellow-500 text-gray-950 px-2 py-0.5 rounded mx-2 font-bold">[${timeStr}]</span> <span class="text-yellow-400 font-black">【${item.name}】</span> 即時同步更新：已點 ${item.count} 盞！ ` + ticker.innerHTML;
+                            }
+
+                            newGrandTotal += item.count;
+                            let p = item.count / item.total;
+                            if (p > highestPercent && p > 0) {
+                                highestPercent = p;
+                                championKey = k;
+                            }
+                        }
+                    }
+                }
+
+                Object.keys(lightData).forEach(k => {
+                    document.getElementById(`badge-${k}`).classList.add('hidden');
+                });
+                if (championKey) {
+                    document.getElementById(`badge-${championKey}`).classList.remove('hidden');
+                }
+
+                if (currentGrandTotal !== newGrandTotal) {
+                    animateValue(document.getElementById('grand-total'), currentGrandTotal, newGrandTotal, 1200);
+                    currentGrandTotal = newGrandTotal;
+                    document.getElementById('grand-bar').style.width = `${(currentGrandTotal / grandTotalLimit) * 100}%`;
+                }
+
+            } catch (error) {
+                console.error('即時同步連線讀取中...', error);
+            }
+        }
+
+        setInterval(fetchSheetData, 5000);
+        fetchSheetData();
+    </script>
+</body>
+</html>
